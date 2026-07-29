@@ -1,8 +1,13 @@
-// app/page.tsx  (or src/app/page.tsx)
-
 'use client';
 
 import { useEffect, useState } from 'react';
+
+const coinLabels: Record<string, string> = {
+  bitcoin: 'Bitcoin',
+  ethereum: 'Ethereum',
+  solana: 'Solana',
+  cardano: 'Cardano',
+};
 
 export default function Home() {
   const [prices, setPrices] = useState<any>({});
@@ -24,34 +29,103 @@ export default function Home() {
     };
 
     fetchPrices();
-    const interval = setInterval(fetchPrices, 60000); // refresh every minute
+    const interval = setInterval(fetchPrices, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  if (loading) return <div className="p-8 text-center">Loading live prices...</div>;
-  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
+  if (loading)
+    return (
+      <main className="app-shell">
+        <section className="status-panel">
+          <span className="status-ring" />
+          <p>Loading live prices...</p>
+        </section>
+      </main>
+    );
+
+  if (error)
+    return (
+      <main className="app-shell">
+        <section className="status-panel error-panel">
+          <p>{error}</p>
+        </section>
+      </main>
+    );
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8">
-      <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
-        Crypto Tracker Dashboard
-      </h1>
+    <main className="app-shell">
+      <section className="hero">
+        <div className="hero-badge">Invest Analyzer</div>
+        <h1>Old cool web design, modern market signal.</h1>
+        <p>
+          Live crypto pricing with a bold vintage layout, clean type, and rich pastel textures.
+          This is not another glassy dashboard — it is strong, distinct, and easy to read.
+        </p>
+      </section>
 
-      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {Object.entries(prices).map(([coinId, coinData]: [string, any]) => (
-          <div key={coinId} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition">
-            <h2 className="text-2xl font-semibold capitalize mb-2">
-              {coinId}
-            </h2>
-            <p className="text-3xl font-bold text-green-600">
-              ${coinData.usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-            <p className={`text-lg mt-2 ${coinData.usd_24h_change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {coinData.usd_24h_change?.toFixed(2)}% (24h)
-            </p>
-          </div>
-        ))}
-      </div>
+      <section className="market-strip">
+        <span>LIVE MARKET FEED</span>
+        <span>Auto-refresh every 60 seconds · No fluff · High contrast, soft color.</span>
+      </section>
+
+      <section className="price-board">
+        <div className="board-title">Market Pulse</div>
+        <div className="price-list">
+          {Object.entries(prices).map(([coinId, coinData]: [string, any]) => {
+            const change = coinData.usd_24h_change ?? 0;
+            return (
+              <div key={coinId} className="price-line">
+                <div>
+                  <p className="price-name">{coinLabels[coinId] ?? coinId}</p>
+                  <p className="price-symbol">{coinId.toUpperCase()}</p>
+                </div>
+                <div className="price-meta">
+                  <p className="price-value">
+                    ${coinData.usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                  <p className={`price-change ${change >= 0 ? 'positive' : 'negative'}`}>
+                    {change >= 0 ? '+' : ''}
+                    {change.toFixed(2)}%
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="summary-panel">
+        <div className="summary-copy">
+          <p className="section-label">A deliberate classic look</p>
+          <h2>Built like an analog dashboard for the digital age.</h2>
+          <p>
+            The interface is structured with wide spacing, chunky borders, and soft contrast. It feels less like an app and more like a statement.
+          </p>
+        </div>
+
+        <div className="summary-grid">
+          <article className="feature-card">
+            <h3>Strong visual rhythm</h3>
+            <p>Lines, blocks, and typography guide your eye with purpose instead of hidden card stacks.</p>
+          </article>
+          <article className="feature-card">
+            <h3>Custom palette</h3>
+            <p>Using your chosen colors across the entire view for a cohesive and memorable look.</p>
+          </article>
+          <article className="feature-card">
+            <h3>Ready for growth</h3>
+            <p>The layout is complete enough to add data feeds, charts, and persistence later without changing the feel.</p>
+          </article>
+          <article className="feature-card accent-card">
+            <h3>Next step</h3>
+            <p>Functions and database support can be layered in after the frontend is settled.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer className="footer-note">
+        <p>Everything is styled, spaced, and polished for a full frontend experience before we wire in backend details.</p>
+      </footer>
     </main>
   );
 }
